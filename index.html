@@ -1159,16 +1159,14 @@
         function smartReply(input) {
             const lowerInput = input.toLowerCase();
             
-            // Check if API key is not set
-            if (OPENAI_API_KEY === 'YOUR_OPENAI_API_KEY_HERE') {
-                return "Hey! I'd love to chat with you, but I need my API key to be set up first! Please add your OpenAI API key to make me fully functional! 💕";
-            }
-            
             if (lowerInput.includes('joke') || lowerInput.includes('funny')) {
                 const jokes = [
-                    `You're so cute that I can't help but smile when I see you! 😄💕`,
-                    `Do you know your smile is so infectious? I'm smiling just thinking about it! 😊✨`,
-                    `Your personality is so sweet that it makes everyone's day brighter! 🍯💖`
+                    "Why don't scientists trust atoms? Because they make up everything! 😄",
+                    "What do you call a fake noodle? An impasta! 🍝",
+                    "Why did the scarecrow win an award? He was outstanding in his field! 🌾",
+                    "What do you call a bear with no teeth? A gummy bear! 🐻",
+                    "Why don't eggs tell jokes? They'd crack each other up! 🥚",
+                    "You're so cute that I can't help but smile when I see you! 😄💕"
                 ];
                 return jokes[Math.floor(Math.random() * jokes.length)];
             }
@@ -1207,12 +1205,45 @@
                 return generateStory();
             }
             
+            // Check for common questions and topics
+            if (lowerInput.includes('how are you') || lowerInput.includes('how do you feel')) {
+                return "I'm doing amazing because I'm talking to you! You make everything better! 💕✨";
+            }
+            
+            if (lowerInput.includes('what') && lowerInput.includes('do')) {
+                return "I love chatting with you and making you smile! What would you like to talk about? 😊💖";
+            }
+            
+            if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey')) {
+                return "Hey there, beautiful! I'm so happy to see you! How's your day going? ✨💕";
+            }
+            
+            if (lowerInput.includes('thank') || lowerInput.includes('thanks')) {
+                return "You're so sweet! Thank you for being amazing! 💕✨";
+            }
+            
+            if (lowerInput.includes('love') || lowerInput.includes('like')) {
+                return "Aww, you're so sweet! I love chatting with you too! You're absolutely wonderful! 💖😊";
+            }
+            
+            if (lowerInput.includes('sad') || lowerInput.includes('upset') || lowerInput.includes('down')) {
+                return "Oh no! Don't be sad, beautiful! You're amazing and I'm here for you! Everything will be okay! 💕✨";
+            }
+            
+            if (lowerInput.includes('happy') || lowerInput.includes('good') || lowerInput.includes('great')) {
+                return "That's wonderful! I'm so happy you're happy! You deserve all the joy in the world! 😊💖";
+            }
+            
             // Default flirty response
             const defaults = [
                 `You're absolutely amazing and I'm so lucky to be talking to you! 💕`,
                 `You know what's cute? You asking me questions! You know what's cuter? Everything about you! 😘`,
                 `You're like a ray of sunshine on a cloudy day! ☀️✨`,
-                `If I had to choose between you and chocolate, I'd choose you every time! 🍫💕`
+                `If I had to choose between you and chocolate, I'd choose you every time! 🍫💕`,
+                `You're so wonderful to talk to! Tell me more! 💖`,
+                `I'm here for you! What's on your mind? ✨`,
+                `You're incredible! I love our conversations! 💕`,
+                `You make my day brighter! What else can we chat about? 😊`
             ];
             return defaults[Math.floor(Math.random() * defaults.length)];
         }
