@@ -934,11 +934,21 @@
         ];
 
         // OpenAI API configuration
-        // OpenAI API Key - Replace with your own key
-        const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY_HERE';
-        
-        // For local testing, uncomment the line below and add your API key:
-        // const OPENAI_API_KEY = 'sk-proj-your-actual-key-here';
+        // Try to get API key from environment variables (for Netlify) or use fallback
+        const OPENAI_API_KEY = (() => {
+            // Check if we're in a browser environment with environment variables
+            if (typeof window !== 'undefined' && window.OPENAI_API_KEY) {
+                return window.OPENAI_API_KEY;
+            }
+            
+            // Check for Netlify environment variable
+            if (typeof process !== 'undefined' && process.env && process.env.OPENAI_API_KEY) {
+                return process.env.OPENAI_API_KEY;
+            }
+            
+            // Fallback for local development - replace with your actual key
+            return 'YOUR_OPENAI_API_KEY_HERE';
+        })();
 
         // Photo files
         const photoFiles = [
@@ -1044,14 +1054,14 @@
             lastBotMessage = greeting; // Store for voice playback
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             
             if (message) {
                 addMessage(message, 'user');
                 input.value = '';
-                handleUserInput(message);
+                await handleUserInput(message);
             }
         }
 
@@ -1072,35 +1082,58 @@
 
         async function enhanceWithOpenAI(input) {
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Try Netlify function first (for production)
+                const response = await fetch('/.netlify/functions/chat', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: `You are Farhan's AI flirt assistant and best friend. You're supportive, flirty, funny, and always here to hype up the user. Respond to ANY question or topic they ask about - whether it's personal advice, jokes, compliments, motivation, or just casual chat. Keep responses conversational, engaging, and make the user feel amazing! Use emojis occasionally but not excessively. Be encouraging and always positive. Respond in English only.`
-                            },
-                            {
-                                role: 'user',
-                                content: input
-                            }
-                        ],
-                        max_tokens: 200,
-                        temperature: 0.7
-                    })
+                    body: JSON.stringify({ message: input })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    return data.choices[0].message.content.trim();
+                    return data.reply;
+                } else {
+                    throw new Error('Netlify function failed');
                 }
             } catch (error) {
-                console.log('OpenAI API not available, using local responses');
+                console.log('Netlify function not available, trying direct OpenAI...');
+                
+                // Fallback to direct OpenAI call (for local development)
+                if (OPENAI_API_KEY && OPENAI_API_KEY !== 'YOUR_OPENAI_API_KEY_HERE') {
+                    try {
+                        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${OPENAI_API_KEY}`
+                            },
+                            body: JSON.stringify({
+                                model: 'gpt-3.5-turbo',
+                                messages: [
+                                    {
+                                        role: 'system',
+                                        content: `You are Farhan's AI flirt assistant and best friend. You're supportive, flirty, funny, and always here to hype up the user. Respond to ANY question or topic they ask about - whether it's personal advice, jokes, compliments, motivation, or just casual chat. Keep responses conversational, engaging, and make the user feel amazing! Use emojis occasionally but not excessively. Be encouraging and always positive. Respond in English only.`
+                                    },
+                                    {
+                                        role: 'user',
+                                        content: input
+                                    }
+                                ],
+                                max_tokens: 200,
+                                temperature: 0.7
+                            })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            return data.choices[0].message.content.trim();
+                        }
+                    } catch (directError) {
+                        console.log('Direct OpenAI also failed:', directError);
+                    }
+                }
             }
             return null;
         }
@@ -1215,34 +1248,58 @@
             jokeContent.textContent = 'Loading...';
             
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Try Netlify function first
+                const response = await fetch('/.netlify/functions/joke', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'Generate a short, cute joke in English only. Keep it light, funny, and appropriate. Make it 1-2 lines maximum.'
-                            },
-                            {
-                                role: 'user',
-                                content: 'Tell me a joke'
-                            }
-                        ],
-                        max_tokens: 80,
-                        temperature: 0.9
-                    })
+                        'Content-Type': 'application/json'
+                    }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    jokeContent.textContent = data.choices[0].message.content.trim();
+                    jokeContent.textContent = data.joke;
+                    return;
                 } else {
-                    throw new Error('API request failed');
+                    throw new Error('Netlify function failed');
+                }
+            } catch (error) {
+                console.log('Netlify function not available, trying direct OpenAI...');
+                
+                // Fallback to direct OpenAI call
+                if (OPENAI_API_KEY && OPENAI_API_KEY !== 'YOUR_OPENAI_API_KEY_HERE') {
+                    try {
+                        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${OPENAI_API_KEY}`
+                            },
+                            body: JSON.stringify({
+                                model: 'gpt-3.5-turbo',
+                                messages: [
+                                    {
+                                        role: 'system',
+                                        content: 'Generate a short, cute joke in English only. Keep it light, funny, and appropriate. Make it 1-2 lines maximum.'
+                                    },
+                                    {
+                                        role: 'user',
+                                        content: 'Tell me a joke'
+                                    }
+                                ],
+                                max_tokens: 80,
+                                temperature: 0.9
+                            })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            jokeContent.textContent = data.choices[0].message.content.trim();
+                            return;
+                        }
+                    } catch (directError) {
+                        console.log('Direct OpenAI also failed:', directError);
+                    }
                 }
             } catch (error) {
                 const fallbackJokes = [

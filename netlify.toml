@@ -9,3 +9,9 @@
 
 [build.environment]
   NODE_VERSION = "18"
+
+[functions]
+  directory = "netlify/functions"
+
+# Environment variables (set these in Netlify dashboard)
+# OPENAI_API_KEY = "your-openai-api-key-here"

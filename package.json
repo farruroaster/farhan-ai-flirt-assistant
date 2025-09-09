@@ -1,0 +1,16 @@
+{
+  "name": "farhan-ai-flirt-assistant",
+  "version": "1.0.0",
+  "description": "AI-powered flirt assistant with Tetris game",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required'",
+    "dev": "echo 'Open index.html in browser'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "keywords": ["ai", "chatbot", "tetris", "game", "flirt", "assistant"],
+  "author": "Farhan",
+  "license": "MIT"
+}
