@@ -1,8 +1,21 @@
 exports.handler = async (event, context) => {
+    const corsHeaders = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    };
+
+    // Handle CORS preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ ok: true }) };
+    }
+
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers: corsHeaders,
             body: JSON.stringify({ error: 'Method not allowed' })
         };
     }
@@ -14,6 +27,7 @@ exports.handler = async (event, context) => {
         if (!apiKey) {
             return {
                 statusCode: 500,
+                headers: corsHeaders,
                 body: JSON.stringify({ error: 'OpenAI API key not configured' })
             };
         }
@@ -43,28 +57,30 @@ exports.handler = async (event, context) => {
         });
 
         if (!response.ok) {
-            throw new Error(`OpenAI API error: ${response.status}`);
+            const errText = await response.text().catch(() => '');
+            console.error('OpenAI API error:', response.status, errText);
+            return {
+                statusCode: response.status,
+                headers: corsHeaders,
+                body: JSON.stringify({ error: 'OpenAI API error', status: response.status, details: errText })
+            };
         }
 
         const data = await response.json();
-        const joke = data.choices[0].message.content.trim();
+        const joke = data?.choices?.[0]?.message?.content?.trim?.() || '';
 
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
-            },
+            headers: corsHeaders,
             body: JSON.stringify({ joke })
         };
 
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Function error:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Internal server error' })
+            headers: corsHeaders,
+            body: JSON.stringify({ error: 'Internal server error', details: String(error && error.message || error) })
         };
     }
 };

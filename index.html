@@ -961,16 +961,22 @@
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-            startPhotoRotation();
-            setupEventListeners();
-            createBackgroundParticles();
-            createFloatingHearts();
-            
-            // Auto-trigger greeting after 500ms (without voice)
-            setTimeout(() => {
-                triggerGreeting();
-            }, 500);
+            console.log('App initializing...');
+            try {
+                initializeApp();
+                startPhotoRotation();
+                setupEventListeners();
+                createBackgroundParticles();
+                createFloatingHearts();
+                
+                // Auto-trigger greeting after 500ms (without voice)
+                setTimeout(() => {
+                    triggerGreeting();
+                }, 500);
+                console.log('App initialized successfully!');
+            } catch (error) {
+                console.error('Error initializing app:', error);
+            }
         });
 
         function initializeApp() {
@@ -1055,13 +1061,18 @@
         }
 
         async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message) {
-                addMessage(message, 'user');
-                input.value = '';
-                await handleUserInput(message);
+            try {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (message) {
+                    addMessage(message, 'user');
+                    input.value = '';
+                    await handleUserInput(message);
+                }
+            } catch (error) {
+                console.error('Error in sendMessage:', error);
+                addMessage("Sorry, I'm having trouble right now. Please try again! 💕", 'bot');
             }
         }
 
@@ -1069,10 +1080,17 @@
             try {
                 // Try OpenAI first for better responses
                 const reply = await enhanceWithOpenAI(input);
-                addMessage(reply, 'bot');
-                lastBotMessage = reply;
+                if (reply) {
+                    addMessage(reply, 'bot');
+                    lastBotMessage = reply;
+                } else {
+                    // Fallback to smart reply if OpenAI returns null
+                    const fallbackReply = smartReply(input);
+                    addMessage(fallbackReply, 'bot');
+                    lastBotMessage = fallbackReply;
+                }
             } catch (error) {
-                console.error('OpenAI error:', error);
+                console.error('Error in handleUserInput:', error);
                 // Fallback to smart reply if OpenAI fails
                 const reply = smartReply(input);
                 addMessage(reply, 'bot');
@@ -1317,13 +1335,23 @@
         }
 
         function addMessage(text, sender) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            messageDiv.textContent = text;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            try {
+                const chatMessages = document.getElementById('chatMessages');
+                if (!chatMessages) {
+                    console.error('Chat messages container not found!');
+                    return;
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                messageDiv.textContent = text;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                console.log(`Message added: ${sender} - ${text.substring(0, 50)}...`);
+            } catch (error) {
+                console.error('Error adding message:', error);
+            }
         }
 
         function say(text) {

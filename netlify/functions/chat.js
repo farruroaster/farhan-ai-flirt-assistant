@@ -1,28 +1,42 @@
 exports.handler = async (event, context) => {
+    // Basic CORS headers
+    const corsHeaders = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    };
+
+    // Handle CORS preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ ok: true }) };
+    }
+
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers: corsHeaders,
             body: JSON.stringify({ error: 'Method not allowed' })
         };
     }
 
     try {
-        const { message } = JSON.parse(event.body);
-        
+        const { message } = JSON.parse(event.body || '{}');
         if (!message) {
             return {
                 statusCode: 400,
+                headers: corsHeaders,
                 body: JSON.stringify({ error: 'Message is required' })
             };
         }
 
         // Get API key from environment variable
         const apiKey = process.env.OPENAI_API_KEY;
-        
         if (!apiKey) {
             return {
                 statusCode: 500,
+                headers: corsHeaders,
                 body: JSON.stringify({ error: 'OpenAI API key not configured' })
             };
         }
@@ -52,28 +66,30 @@ exports.handler = async (event, context) => {
         });
 
         if (!response.ok) {
-            throw new Error(`OpenAI API error: ${response.status}`);
+            const errText = await response.text().catch(() => '');
+            console.error('OpenAI API error:', response.status, errText);
+            return {
+                statusCode: response.status,
+                headers: corsHeaders,
+                body: JSON.stringify({ error: 'OpenAI API error', status: response.status, details: errText })
+            };
         }
 
         const data = await response.json();
-        const reply = data.choices[0].message.content.trim();
+        const reply = data?.choices?.[0]?.message?.content?.trim?.() || '';
 
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
-            },
+            headers: corsHeaders,
             body: JSON.stringify({ reply })
         };
 
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Function error:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Internal server error' })
+            headers: corsHeaders,
+            body: JSON.stringify({ error: 'Internal server error', details: String(error && error.message || error) })
         };
     }
 };
