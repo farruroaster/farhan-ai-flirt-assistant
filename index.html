@@ -936,6 +936,9 @@
         // OpenAI API configuration
         // OpenAI API Key - Replace with your own key
         const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY_HERE';
+        
+        // For local testing, uncomment the line below and add your API key:
+        // const OPENAI_API_KEY = 'sk-proj-your-actual-key-here';
 
         // Photo files
         const photoFiles = [
@@ -1052,21 +1055,19 @@
             }
         }
 
-        function handleUserInput(input) {
-            let reply = smartReply(input);
-            
-            // Try to enhance with OpenAI if available
-            enhanceWithOpenAI(input).then(enhancedReply => {
-                if (enhancedReply) {
-                    reply = enhancedReply;
-                }
+        async function handleUserInput(input) {
+            try {
+                // Try OpenAI first for better responses
+                const reply = await enhanceWithOpenAI(input);
                 addMessage(reply, 'bot');
-                lastBotMessage = reply; // Store for voice playback
-            }).catch(() => {
-                // Fallback to local reply if OpenAI fails
+                lastBotMessage = reply;
+            } catch (error) {
+                console.error('OpenAI error:', error);
+                // Fallback to smart reply if OpenAI fails
+                const reply = smartReply(input);
                 addMessage(reply, 'bot');
-                lastBotMessage = reply; // Store for voice playback
-            });
+                lastBotMessage = reply;
+            }
         }
 
         async function enhanceWithOpenAI(input) {
@@ -1082,15 +1083,15 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `You are Farhan's AI flirt assistant. Respond in English only. You're here to hype up the user with cute, flirty, and supportive messages. Keep responses short (1-2 sentences), playful, and heartwarming. Be encouraging and make her smile.`
+                                content: `You are Farhan's AI flirt assistant and best friend. You're supportive, flirty, funny, and always here to hype up the user. Respond to ANY question or topic they ask about - whether it's personal advice, jokes, compliments, motivation, or just casual chat. Keep responses conversational, engaging, and make the user feel amazing! Use emojis occasionally but not excessively. Be encouraging and always positive. Respond in English only.`
                             },
                             {
                                 role: 'user',
                                 content: input
                             }
                         ],
-                        max_tokens: 100,
-                        temperature: 0.8
+                        max_tokens: 200,
+                        temperature: 0.7
                     })
                 });
 
@@ -1106,6 +1107,11 @@
 
         function smartReply(input) {
             const lowerInput = input.toLowerCase();
+            
+            // Check if API key is not set
+            if (OPENAI_API_KEY === 'YOUR_OPENAI_API_KEY_HERE') {
+                return "Hey! I'd love to chat with you, but I need my API key to be set up first! Please add your OpenAI API key to make me fully functional! 💕";
+            }
             
             if (lowerInput.includes('joke') || lowerInput.includes('funny')) {
                 const jokes = [
