@@ -610,6 +610,89 @@
             transform: translateY(0);
         }
 
+        /* Mobile Touch Controls */
+        .mobile-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .mobile-btn {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+            min-width: 60px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-btn:active {
+            transform: scale(0.95);
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.5);
+        }
+
+        .mobile-btn:hover {
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+        }
+
+        .mobile-drop {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            min-width: 120px;
+            font-size: 16px;
+        }
+
+        .mobile-drop:active {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .mobile-drop:hover {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        /* Hide mobile controls on desktop */
+        @media (min-width: 768px) {
+            .mobile-controls {
+                display: none;
+            }
+        }
+
+        /* Show mobile controls on mobile */
+        @media (max-width: 767px) {
+            .mobile-controls {
+                display: flex;
+            }
+            
+            .game-controls {
+                margin-bottom: 10px;
+            }
+        }
+
         .game-over {
             position: absolute;
             top: 50%;
@@ -724,11 +807,23 @@
                 </div>
             </div>
             <div class="tetris-board" id="tetrisBoard"></div>
-            <div class="game-controls">
-                <button class="control-btn" id="pauseBtn">Pause</button>
-                <button class="control-btn" id="restartBtn">Restart</button>
-                <button class="control-btn" id="closeGame">Exit</button>
-            </div>
+                        <div class="game-controls">
+                            <button class="control-btn" id="pauseBtn">Pause</button>
+                            <button class="control-btn" id="restartBtn">Restart</button>
+                            <button class="control-btn" id="closeGame">Exit</button>
+                        </div>
+                        
+                        <!-- Mobile Touch Controls -->
+                        <div class="mobile-controls">
+                            <div class="control-row">
+                                <button class="mobile-btn" id="mobileLeft">←</button>
+                                <button class="mobile-btn" id="mobileRotate">↻</button>
+                                <button class="mobile-btn" id="mobileRight">→</button>
+                            </div>
+                            <div class="control-row">
+                                <button class="mobile-btn mobile-drop" id="mobileDrop">⬇ Drop</button>
+                            </div>
+                        </div>
             <div class="game-over" id="gameOver">
                 <h3>🎮 Game Over! 🎮</h3>
                 <div class="final-score">Final Score: <span id="finalScore">0</span></div>
@@ -861,6 +956,12 @@
                     sendMessage();
                 }
             });
+            
+            // Mobile touch controls for Tetris
+            document.getElementById('mobileLeft').addEventListener('click', () => movePiece(-1, 0));
+            document.getElementById('mobileRight').addEventListener('click', () => movePiece(1, 0));
+            document.getElementById('mobileRotate').addEventListener('click', rotatePiece);
+            document.getElementById('mobileDrop').addEventListener('click', dropPiece);
             
             // Keyboard controls for Tetris
             document.addEventListener('keydown', handleKeyPress);
