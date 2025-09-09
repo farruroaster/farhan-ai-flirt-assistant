@@ -612,15 +612,16 @@
 
         /* Mobile Touch Controls */
         .mobile-controls {
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             gap: 15px;
             margin-top: 20px;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 107, 157, 0.2);
             border-radius: 20px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
         }
 
         .control-row {
@@ -630,23 +631,25 @@
         }
 
         .mobile-btn {
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab) !important;
             border: none;
             border-radius: 15px;
             padding: 15px 20px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
-            min-width: 60px;
-            min-height: 50px;
-            display: flex;
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+            min-width: 70px;
+            min-height: 60px;
+            display: flex !important;
             align-items: center;
             justify-content: center;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .mobile-btn:active {
@@ -1221,8 +1224,16 @@
             spawnPiece();
             startGameLoop();
             
+            // Force show mobile controls
+            const mobileControls = document.querySelector('.mobile-controls');
+            if (mobileControls) {
+                mobileControls.style.display = 'flex';
+                mobileControls.style.visibility = 'visible';
+                mobileControls.style.opacity = '1';
+            }
+            
             // Add a fun message to chat
-            const gameMessage = `🎮 Tetris Challenge started! Use arrow keys to move and rotate pieces! Good luck! 💕`;
+            const gameMessage = `🎮 Tetris Challenge started! Use arrow keys or touch buttons to play! Good luck! 💕`;
             addMessage(gameMessage, 'bot');
             lastBotMessage = gameMessage;
         }
