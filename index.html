@@ -1282,7 +1282,7 @@
                     throw new Error('Netlify function failed');
                 }
             } catch (error) {
-                console.log('Netlify function not available, trying direct OpenAI...');
+                console.log('Netlify function not available, trying direct OpenAI...', error);
                 
                 // Fallback to direct OpenAI call
                 if (OPENAI_API_KEY && OPENAI_API_KEY !== 'YOUR_OPENAI_API_KEY_HERE') {
@@ -1319,7 +1319,8 @@
                         console.log('Direct OpenAI also failed:', directError);
                     }
                 }
-            } catch (error) {
+
+                // Final fallback if both Netlify function and direct OpenAI fail or are unavailable
                 const fallbackJokes = [
                     'Do you know your smile is so contagious? I\'m smiling just thinking about it! 😄',
                     'You\'re so cute that I can\'t help but smile when I see you! 😊',
