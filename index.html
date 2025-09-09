@@ -506,44 +506,88 @@
             align-items: center;
             z-index: 1000;
             backdrop-filter: blur(10px);
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         .game-container {
             background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 95%;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+            width: 100%;
+            max-height: 95vh;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        /* Mobile optimizations for iPhone 15 */
+        @media (max-width: 480px) {
+            .game-modal {
+                padding: 5px;
+            }
+            
+            .game-container {
+                padding: 10px;
+                border-radius: 10px;
+                max-height: 98vh;
+            }
         }
 
         .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: white;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .game-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .game-stats {
             display: flex;
-            gap: 15px;
-            font-size: 0.9rem;
+            gap: 8px;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
         }
 
         .stat {
             background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 10px;
+            padding: 4px 8px;
+            border-radius: 8px;
             backdrop-filter: blur(10px);
+        }
+
+        /* Mobile header optimizations */
+        @media (max-width: 480px) {
+            .game-header {
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 8px;
+                gap: 6px;
+            }
+            
+            .game-title {
+                font-size: 1rem;
+                text-align: center;
+            }
+            
+            .game-stats {
+                gap: 6px;
+            }
+            
+            .stat {
+                padding: 3px 6px;
+                font-size: 0.75rem;
+            }
         }
 
         .tetris-board {
@@ -552,12 +596,22 @@
             grid-template-rows: repeat(20, 1fr);
             gap: 1px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 8px;
             margin: 0 auto;
-            width: 300px;
-            height: 600px;
+            width: 280px;
+            height: 560px;
             border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Mobile board optimizations */
+        @media (max-width: 480px) {
+            .tetris-board {
+                width: 240px;
+                height: 480px;
+                padding: 6px;
+                border-radius: 6px;
+            }
         }
 
         .tetris-cell {
@@ -583,8 +637,17 @@
         .game-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile game controls */
+        @media (max-width: 480px) {
+            .game-controls {
+                gap: 6px;
+                margin-top: 8px;
+            }
         }
 
         .control-btn {
@@ -614,14 +677,23 @@
         .mobile-controls {
             display: flex !important;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-            padding: 12px;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 10px;
             background: rgba(255, 107, 157, 0.15);
-            border-radius: 15px;
+            border-radius: 12px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 107, 157, 0.3);
-            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.2);
+            box-shadow: 0 3px 12px rgba(255, 107, 157, 0.2);
+        }
+
+        /* Mobile controls optimization */
+        @media (max-width: 480px) {
+            .mobile-controls {
+                margin-top: 8px;
+                padding: 8px;
+                gap: 5px;
+            }
         }
 
         .control-row {
