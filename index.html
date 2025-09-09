@@ -675,22 +675,14 @@
             background: linear-gradient(135deg, #4facfe, #00f2fe);
         }
 
-        /* Hide mobile controls on desktop */
-        @media (min-width: 768px) {
-            .mobile-controls {
-                display: none;
-            }
+        /* Always show mobile controls */
+        .mobile-controls {
+            display: flex !important;
         }
-
-        /* Show mobile controls on mobile */
-        @media (max-width: 767px) {
-            .mobile-controls {
-                display: flex;
-            }
-            
-            .game-controls {
-                margin-bottom: 10px;
-            }
+        
+        /* Adjust spacing for mobile controls */
+        .game-controls {
+            margin-bottom: 10px;
         }
 
         .game-over {
